@@ -42,9 +42,23 @@ def display(ms, order_of_mag=-1):
 in_p = Pin(9, mode=Pin.IN)
 out_p = Pin(10, mode=Pin.OUT)
 
+
+MAG_MIN = -1
+MAG_MAX = 3
+ORDER_OF_MAG = -1  #ms
+def change_order_of_mag():
+    global ORDER_OF_MAG
+    ORDER_OF_MAG += 1
+    if ORDER_OF_MAG > MAG_MAX:
+        ORDER_OF_MAG = MAG_MIN
+    print("CHANGED ORDER OF MAG")
+
+button = Pin(2, mode=Pin.IN)
+button.irq(handler=change_order_of_mag, trigger=Pin.IRQ_RISING)
+
 def display_time():
     print(r.value())
-    display(r.value()/1000)
+    display(r.value()/1000, order_of_mag=ORDER_OF_MAG)
     with open(delay_file, "w") as f:
         f.write(str(r.value()))
 
