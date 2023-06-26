@@ -51,6 +51,7 @@ def change_order_of_mag():
     ORDER_OF_MAG += 1
     if ORDER_OF_MAG > MAG_MAX:
         ORDER_OF_MAG = MAG_MIN
+    r.set(incr=10 ** (3 + ORDER_OF_MAG))  # ms to micros
     print("CHANGED ORDER OF MAG")
 
 button = Pin(2, mode=Pin.IN)
