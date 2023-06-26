@@ -25,12 +25,18 @@ HEIGHT= 64
 i2c = I2C(1, scl=Pin(7), sda=Pin(6), freq=200000)
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 
-def display(number, order_of_mag=-1):
+def display(ms, order_of_mag=-1):
     oled.fill(0)
-    num_pos = WIDTH//2 - len(number)*8//2
-    oled.text(number, num_pos, HEIGHT//2 - 8//2)
-    shift_chars = (order_of_mag < 0) - order_of_mag
-    oled.text("^", num_pos + shift_chars * 8, HEIGHT // 2 + 8//2)
+    str_ms = f"{ms:.1f}"
+    str_all = f"{str_ms} ms"
+    num_pos = WIDTH//2 - len(str_all)*8//2
+    oled.text(str_all, num_pos, HEIGHT//2 - 8//2)
+    oled.text(
+        "^",
+        # offset by 3 for 1dp
+        num_pos + (len(str_ms) - 3 + (order_of_mag < 0) - order_of_mag) * 8,
+        HEIGHT // 2 + 8//2,
+    )
     oled.show()
 
 in_p = Pin(9, mode=Pin.IN)
@@ -38,7 +44,7 @@ out_p = Pin(10, mode=Pin.OUT)
 
 def display_time():
     print(r.value())
-    display(f"{r.value()/1000:.1f} ms")
+    display(r.value()/1000)
     with open(delay_file, "w") as f:
         f.write(str(r.value()))
 
