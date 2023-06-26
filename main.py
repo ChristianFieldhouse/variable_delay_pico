@@ -35,7 +35,7 @@ def display(ms, order_of_mag=-1):
         "^",
         # offset by 3 for 1dp
         num_pos + (len(str_ms) - 3 + (order_of_mag < 0) - order_of_mag) * 8,
-        HEIGHT // 2 + 8//2,
+        HEIGHT // 2 + 5,
     )
     oled.show()
 
@@ -46,15 +46,20 @@ out_p = Pin(10, mode=Pin.OUT)
 MAG_MIN = -1
 MAG_MAX = 3
 ORDER_OF_MAG = -1  #ms
-def change_order_of_mag():
-    global ORDER_OF_MAG
+oom_last_changed = time.ticks_ms()
+def change_order_of_mag(p):
+    global ORDER_OF_MAG, oom_last_changed
+    if time.ticks_diff(time.ticks_ms(), oom_last_changed) < 200:
+        return
+    oom_last_changed = time.ticks_ms()
     ORDER_OF_MAG += 1
     if ORDER_OF_MAG > MAG_MAX:
         ORDER_OF_MAG = MAG_MIN
     r.set(incr=10 ** (3 + ORDER_OF_MAG))  # ms to micros
+    display(r.value()/1000, order_of_mag=ORDER_OF_MAG)
     print("CHANGED ORDER OF MAG")
 
-button = Pin(2, mode=Pin.IN)
+button = Pin(2, mode=Pin.IN, pull=Pin.PULL_UP)
 button.irq(handler=change_order_of_mag, trigger=Pin.IRQ_RISING)
 
 def display_time():
@@ -67,7 +72,7 @@ r.add_listener(display_time)
 display_time()
 
 pulse_length = 200
-while True:
+while False:
     # wait for the next rising edge
     while not in_p.value():
         pass
