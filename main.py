@@ -72,7 +72,7 @@ r.add_listener(display_time)
 display_time()
 
 pulse_length = 200
-while False:
+while True:
     # wait for the next rising edge
     while not in_p.value():
         pass
