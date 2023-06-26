@@ -24,9 +24,13 @@ WIDTH =128
 HEIGHT= 64
 i2c = I2C(1, scl=Pin(7), sda=Pin(6), freq=200000)
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
-def display(number):
+
+def display(number, order_of_mag=-1):
     oled.fill(0)
-    oled.text(number, WIDTH//2 - len(number)*8//2, HEIGHT//2 - 8//2)
+    num_pos = WIDTH//2 - len(number)*8//2
+    oled.text(number, num_pos, HEIGHT//2 - 8//2)
+    shift_chars = (order_of_mag < 0) - order_of_mag
+    oled.text("^", num_pos + shift_chars * 8, HEIGHT // 2 + 8//2)
     oled.show()
 
 in_p = Pin(9, mode=Pin.IN)
